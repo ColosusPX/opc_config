@@ -15,17 +15,17 @@ int main()
     
     json::value varOut;
 
-    retval = UA_STATUSCODE_BAD;
+    retval = UA_STATUSCODE_BADBOUNDNOTFOUND;
     while (retval != UA_STATUSCODE_GOOD)
     {
         if (!running) return -1;
-        retval = UA_Client_connectUsername(client,
-                                            ((settings["address"].as_string() + ":" + settings["port"].as_string() + settings["endpoint"].as_string()).c_str()),
-                                            (settings["login"].as_string().c_str()),
-                                            (settings["password"]).as_string().c_str());
+        // retval = UA_Client_connectUsername(client,
+        //                                     ((settings["address"].as_string() + ":" + settings["port"].as_string() + settings["endpoint"].as_string()).c_str()),
+        //                                     (settings["login"].as_string().c_str()),
+        //                                     (settings["password"]).as_string().c_str());
         
-        // retval = UA_Client_connect(client, ((settings["address"].as_string() + ":" + settings["port"].as_string()).c_str()));
-        sleep_ms(1000);
+        retval = UA_Client_connect(client, ((settings["address"].as_string() + ":" + settings["port"].as_string()).c_str()));
+        sleep_ms(5000);
     }
 
     if (retval != UA_STATUSCODE_GOOD)

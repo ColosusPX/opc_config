@@ -20,9 +20,9 @@ using namespace web;
 using namespace web::json;
 
 UA_Boolean running = true;
-UA_StatusCode retval = UA_STATUSCODE_BAD;
+UA_StatusCode retval = UA_STATUSCODE_BADBOUNDNOTFOUND;
 
-char *clientJson = "../configs/client_https.json";
+char *clientJson = "../configs/client_test.json";
 char *variableJson = "../configs/variable_test.json";
 
 typedef enum
@@ -103,40 +103,42 @@ inline UA_Client *InitClient()
 */
 inline UA_Client *InitSecureClient(string secMode, string secPolicy)
 {
-    ifstream fin("../client_cert.der",ios_base::in|ios_base::binary);    
-    fin.seekg(0,ios_base::end);
-    size_t uSize = fin.tellg();
-    fin.seekg(0);
+    // ifstream fin("../client_cert.der",ios_base::in|ios_base::binary);    
+    // fin.seekg(0,ios_base::end);
+    // size_t uSize = fin.tellg();
+    // fin.seekg(0);
 
-    char* t = new char[uSize];
-    fin.read(t,uSize);
+    // char* t = new char[uSize];
+    // fin.read(t,uSize);
 
-    UA_ByteString cert =  loadCert(t, uSize);
+    // UA_ByteString cert =  loadCert(t, uSize);
+    UA_ByteString cert = loadFile("../client_cert.der");  
     UA_ByteString key = loadFile("../client_key.der");  
 
     UA_Client *client = UA_Client_new();
 
     UA_ClientConfig* cc = UA_Client_getConfig(client);
 
-    string basePolicy = "http://opcfoundation.org/UA/SecurityPolicy#";
+    string basePolicy = "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256";
 
     // Set to default config with no trust and issuer list
     UA_ClientConfig_setDefaultEncryption(cc, cert, key, NULL, 0, NULL, 0);
 
     // Set securityMode and securityPolicyUri
     UA_ByteString_clear(&cc->securityPolicyUri);
-    if(secMode == "None")
-        cc->securityMode = UA_MESSAGESECURITYMODE_NONE;
-    else if(secMode == "Sign")
-        cc->securityMode = UA_MESSAGESECURITYMODE_SIGN;
-    else if(secMode == "SignAndEncrypt")
-        cc->securityMode = UA_MESSAGESECURITYMODE_SIGNANDENCRYPT;
-    cc->securityPolicyUri = UA_String_fromChars((basePolicy + secPolicy).c_str());
+    // if(secMode == "None")
+    //     cc->securityMode = UA_MESSAGESECURITYMODE_NONE;
+    // else if(secMode == "Sign")
+    //     cc->securityMode = UA_MESSAGESECURITYMODE_SIGN;
+    // else if(secMode == "SignAndEncrypt")
+    cc->securityMode = UA_MESSAGESECURITYMODE_SIGNANDENCRYPT;
+    // cc->securityPolicyUri = UA_String_fromChars((basePolicy + secPolicy).c_str());
+    cc->securityPolicyUri = UA_String_fromChars(basePolicy.c_str());
 
     // Set uri and client type
     UA_ApplicationDescription_clear(&cc->clientDescription);
     UA_String_clear(&cc->clientDescription.applicationUri);
-    cc->clientDescription.applicationUri = UA_STRING_ALLOC("urn:OpcPlc:f9f52d460f6a");
+    cc->clientDescription.applicationUri = UA_STRING_ALLOC("urn:DESKTOP-P1QNPM6:UnifiedAutomation:UaExpert");
     cc->clientDescription.applicationType = UA_APPLICATIONTYPE_CLIENT;
 
     return client;

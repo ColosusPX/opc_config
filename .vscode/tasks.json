@@ -10,7 +10,9 @@
         "${file}",
         "-lopen62541",
         "-lcpprest",
-        "-lcrypto",
+        "-lmbedtls",
+        "-lmbedx509",
+        "-lmbedcrypto",
         "-o",
         "${fileDirname}/${fileBasenameNoExtension}"
       ],
